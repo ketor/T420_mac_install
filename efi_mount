@@ -1,0 +1,9 @@
+#!/bin/bash
+if [ -z ${1} ]; then
+    echo "Usage:  efi_mount [0/1/2/3/4]"
+    exit
+fi
+
+sudo mkdir /Volumes/ESP
+sudo mount -t msdos /dev/disk${1}s1 /Volumes/ESP
+

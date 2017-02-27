@@ -1,0 +1,82 @@
+#!/bin/bash
+echo "Install efi files ?  Please intput yes/no"
+read user_option
+
+if [ -z ${user_option} ]; then
+    echo "Input must be yes/no"
+    exit
+fi
+
+if [ ${user_option} != "yes" ]; then
+    echo "Exit install"
+    exit
+fi
+
+echo "Install now"
+
+#1 Install Clover on the HD
+sudo mkdir /Volumes/ESP
+sudo mount -t msdos /dev/disk0s1 /Volumes/ESP
+
+rm -rf /Volumes/ESP/EFI
+cp -a ~/Downloads/T420-distribute/EFI/ /Volumes/ESP/EFI
+
+cd /Volumes/ESP/EFI/CLOVER
+mv config.1600x900.plist config.plist
+echo "<<<<EFI dir copied"
+
+#1.1 Create a custom AppleBackLightInjector kext, if on 10.12.4 or later
+cd ~/Downloads/T420-distribute/Utilities/create_AppleBacklightInjector_T420_T460
+sudo ./create_injector.bash T420
+echo "create_injector.bash T420 OK"
+
+#1.2 Add PID 8678 0x21E6 VID 2652 0xA5C BLE 4.0 support
+rm -f /Volumes/ESP/EFI/CLOVER/kexts/Other/BlueTooth_Injector_T420.kext/Contents/Info.plist
+cp /usr/local/bin/BLE8678_2652.plist /Volumes/ESP/EFI/CLOVER/kexts/Other/BlueTooth_Injector_T420.kext/Contents/Info.plist
+echo "BLE8678_2652.plist added"
+
+#2 Install custom kexts on HD
+cd ~/Downloads/T420-distribute/EFI/CLOVER/kexts
+sudo ./_kext-install.command
+echo "<<<<Kext installed"
+
+#3 Ethernet Device Installation
+sudo kextload /Library/Extensions/IntelMausiEthernet.kext
+sleep 10
+sudo rm       /Library/Preferences/SystemConfiguration/NetworkInterfaces.plist
+echo "<<<<Ethernet installed"
+
+#4 Install (copy) the DisplayVendorID-* directories
+sudo cp -a ~/Downloads/T420-distribute/\:System\:Library\:Displays\:Contents\:Resources\:Overrides/DisplayVendorID-* /System/Library/Displays/Contents/Resources/Overrides/
+echo "<<<<DisplayVendorID copied"
+
+#5 AppleHDA_20672.kext symbolic fix
+cd /Library/Extensions/AppleHDA_20672.kext/Contents/MacOS
+sudo rm AppleHDA
+sudo ln -s /System/Library/Extensions/AppleHDA.kext/Contents/MacOS/AppleHDA
+sudo touch /System/Library/Extensions
+echo "<<<<AppleHDA_20672.kext symbolic fixed"
+
+#6 Hibernation mode set to 0
+sudo pmset -a hibernatemode 0
+sudo rm /var/vm/sleepimage
+echo "<<<<Hibernation mode set to 0"
+
+#7 ACPIPoller
+cp -a /Volumes/ESP/EFI/CLOVER/ACPI/dsdt.heat-step.aml /Volumes/ESP/EFI/CLOVER/ACPI/patched/dsdt.aml
+
+cd ~/Downloads/T420-distribute/Utilities
+sudo cp -a ACPIPoller.kext /Library/Extensions
+sudo chown -R 0:0 /Library/Extensions/ACPIPoller.kext
+sudo chmod -R go-w /Library/Extensions/ACPIPoller.kext
+sudo kextcache -i /
+echo "<<<<ACPIPoller installed"
+
+#8 ssdt
+cd ~/Downloads/T420-distribute/Utilities
+sudo ./ssdtPRGen-clover.command
+echo "<<<<ssdt generated"
+
+#9 CsrActiveConfig to 0x67
+echo "<<<<Change CsrActiveConfig to 0x67 by yourself"
+
