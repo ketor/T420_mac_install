@@ -23,17 +23,17 @@ rm -f ~/Downloads/T420-distribute/EFI/CLOVER/kexts/Other/BlueTooth_Injector_T420
 cp ./BLE8678_2652.plist ~/Downloads/T420-distribute/EFI/CLOVER/kexts/Other/BlueTooth_Injector_T420.kext/Contents/Info.plist
 echo "BLE8678_2652.plist added"
 
+#1.2 Create a custom AppleBackLightInjector kext, if on 10.12.4 or later
+cd ~/Downloads/T420-distribute/Utilities/create_AppleBacklightInjector_T420_T460
+sudo ./createAppleBacklightInjector.bash T420
+echo "createAppleBacklightInjector.bash T420 OK"
+
 rm -rf /Volumes/ESP/EFI
 cp -a ~/Downloads/T420-distribute/EFI/ /Volumes/ESP/EFI
 
 cd /Volumes/ESP/EFI/CLOVER
 mv config.1600x900.plist config.plist
 echo "<<<<EFI dir copied"
-
-#1.2 Create a custom AppleBackLightInjector kext, if on 10.12.4 or later
-cd ~/Downloads/T420-distribute/Utilities/create_AppleBacklightInjector_T420_T460
-sudo ./create_injector.bash T420
-echo "create_injector.bash T420 OK"
 
 #2 Install custom kexts on HD
 cd ~/Downloads/T420-distribute/EFI/CLOVER/kexts
