@@ -18,6 +18,11 @@ echo "Install now"
 sudo mkdir /Volumes/ESP
 sudo mount -t msdos /dev/disk0s1 /Volumes/ESP
 
+#1.1 Add PID 8678 0x21E6 VID 2652 0xA5C BLE 4.0 support
+rm -f ~/Downloads/T420-distribute/EFI/CLOVER/kexts/Other/BlueTooth_Injector_T420.kext/Contents/Info.plist
+cp /usr/local/bin/BLE8678_2652.plist ~/Downloads/T420-distribute/EFI/CLOVER/kexts/Other/BlueTooth_Injector_T420.kext/Contents/Info.plist
+echo "BLE8678_2652.plist added"
+
 rm -rf /Volumes/ESP/EFI
 cp -a ~/Downloads/T420-distribute/EFI/ /Volumes/ESP/EFI
 
@@ -25,15 +30,10 @@ cd /Volumes/ESP/EFI/CLOVER
 mv config.1600x900.plist config.plist
 echo "<<<<EFI dir copied"
 
-#1.1 Create a custom AppleBackLightInjector kext, if on 10.12.4 or later
+#1.2 Create a custom AppleBackLightInjector kext, if on 10.12.4 or later
 cd ~/Downloads/T420-distribute/Utilities/create_AppleBacklightInjector_T420_T460
 sudo ./create_injector.bash T420
 echo "create_injector.bash T420 OK"
-
-#1.2 Add PID 8678 0x21E6 VID 2652 0xA5C BLE 4.0 support
-rm -f /Volumes/ESP/EFI/CLOVER/kexts/Other/BlueTooth_Injector_T420.kext/Contents/Info.plist
-cp /usr/local/bin/BLE8678_2652.plist /Volumes/ESP/EFI/CLOVER/kexts/Other/BlueTooth_Injector_T420.kext/Contents/Info.plist
-echo "BLE8678_2652.plist added"
 
 #2 Install custom kexts on HD
 cd ~/Downloads/T420-distribute/EFI/CLOVER/kexts
