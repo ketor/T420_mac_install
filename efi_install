@@ -14,9 +14,12 @@ fi
 
 echo "Install now"
 
+echo "Please intput disk num [0-9]:"
+read disk_num
+
 #1 Install Clover on the HD
 sudo mkdir /Volumes/ESP
-sudo mount -t msdos /dev/disk0s1 /Volumes/ESP
+sudo mount -t msdos /dev/disk${disk_num}s1 /Volumes/ESP
 
 #1.1 Add PID 8678 0x21E6 VID 2652 0xA5C BLE 4.0 support
 rm -f ~/Downloads/T420-distribute/EFI/CLOVER/kexts/Other/BlueTooth_Injector_T420.kext/Contents/Info.plist
